@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { doctors } from "../../assets/data/doctors";
 import DoctorCard from "./../../components/Doctors/DoctorCard";
+import { BASE_URL } from "./../../config";
+import useFetchData from "./../../hooks/useFetchData";
 
 const Doctors = () => {
+  const [query, setQuery] = useState("");
+
+  const [debounceQuery, setDebounceQuery] = useState("");
+
+  const handleSearch = () => {
+    setQuery(query.trim());
+    console.log("handle search");
+  };
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebounceQuery(query);
+    }, 700);
+
+    return () => clearTimeout(timeout);
+  }, [query]);
+
+  const { data: doctors } = useFetchData(`${BASE_URL}/doctors?query=${query}`);
   return (
     <>
       <section className="bg-[#fff9ea]">
@@ -12,9 +32,14 @@ const Doctors = () => {
             <input
               type="search"
               className="py-4 pl-4 pr-2 bg-transparent w-full focus:outline-none cursor-pointer placeholder:text-textColor"
-              placeholder="Search Doctor"
+              placeholder="Search doctor by name or specification"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
             />
-            <button className="btn mt-0 rounded-[0px] rounded-r-md">
+            <button
+              className="btn mt-0 rounded-[0px] rounded-r-md"
+              onClick={handleSearch}
+            >
               Search
             </button>
           </div>

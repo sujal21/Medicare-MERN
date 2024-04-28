@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
+import uploadImageToCloudinary from "./../../components/utils/uploadCloudinary";
+import { BASE_URL, token } from "./../../config";
+import { toast } from "react-toastify";
 
-const Profile = () => {
+const Profile = ({ doctorData }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "",
     phone: "",
     bio: "",
     gender: "",
@@ -17,14 +21,59 @@ const Profile = () => {
     photo: null,
   });
 
+  useEffect(() => {
+    setFormData({
+      name: doctorData.name,
+      email: doctorData.email,
+      phone: doctorData.phone,
+      bio: doctorData.bio,
+      gender: doctorData.gender,
+      specialization: doctorData.specialization,
+      ticketPrice: doctorData.ticketPrice,
+      qualifications: doctorData.qualifications,
+      experiences: doctorData.experiences,
+      timeSlots: doctorData.timeSlots,
+      about: doctorData.about,
+      photo: doctorData.photo,
+    });
+  }, [doctorData]);
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleFileInputChange = (e) => {};
+  const handleFileInputChange = async (event) => {
+    const file = event.target.files[0];
+
+    const data = await uploadImageToCloudinary(file);
+
+    //console.log(data);
+    setFormData({ ...formData, photo: data.url });
+  };
 
   const updateProfileHandler = async (e) => {
     e.preventDefault();
+
+    try {
+      const res = await fetch(`${BASE_URL}/doctors/${doctorData._id}`, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw Error(result.message);
+      }
+
+      toast.success(result.message);
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   const addItem = (key, item) => {
@@ -62,8 +111,8 @@ const Profile = () => {
     addItem("qualifications", {
       startingDate: "",
       endingDate: "",
-      degree: "",
-      university: "",
+      degree: "PHD",
+      university: "ABC",
     });
   };
 
@@ -82,8 +131,8 @@ const Profile = () => {
     addItem("experiences", {
       startingDate: "",
       endingDate: "",
-      position: "",
-      hospital: "",
+      position: "Senior Surgeon",
+      hospital: "ABC",
     });
   };
 
@@ -99,7 +148,7 @@ const Profile = () => {
   const addTimeSlot = (e) => {
     e.preventDefault();
 
-    addItem("timeSlots", { day: "", startingTime: "", endingTime: "" });
+    addItem("timeSlots", { day: "Sunday", startingTime: "", endingTime: "" });
   };
 
   const handleTimeSlotChange = (event, index) => {
@@ -160,7 +209,7 @@ const Profile = () => {
         <div className="mb-5">
           <p className="form__label">Bio*</p>
           <input
-            type="number"
+            type="text"
             name="bio"
             value={formData.bio}
             onChange={handleInputChange}
@@ -195,9 +244,9 @@ const Profile = () => {
                 className="form__input py-3.5"
               >
                 <option value="">Select</option>
-                <option value="surgeon">Surgeon</option>
-                <option value="neurologist">Neurologist</option>
-                <option value="dermatologist">Dermatologist</option>
+                <option value="Surgeon">Surgeon</option>
+                <option value="Neurologist">Neurologist</option>
+                <option value="Dermatologist">Dermatologist</option>
               </select>
             </div>
 

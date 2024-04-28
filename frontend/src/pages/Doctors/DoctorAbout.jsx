@@ -8,15 +8,10 @@ const DoctorAbout = ({ name, about, qualifications, experiences }) => {
         <h3 className="text-[20px] leading-[30px] text-headingColor font-semibold flex items-center gap-2">
           About of
           <span className="text-irisBlueColor font-bold text-[24px] leading-9">
-            Travis Head
+            {name}
           </span>
         </h3>
-        <p className="text__para">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec lectus
-          massa, sodales sed lorem viverra, ultrices convallis sem. Integer
-          gravida sodales erat sit amet vulputate. Integer in augue eget sapien
-          molestie tempor.
-        </p>
+        <p className="text__para">{about}</p>
       </div>
       <div className="mt-12">
         <h3 className="text-[20px] leading-[30px] text-headingColor font-semibold">
